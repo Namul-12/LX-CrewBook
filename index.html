@@ -85,7 +85,7 @@
   .cat-card.disabled:active{transform:none;}
 
   label.field-label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin:0 0 6px;letter-spacing:.01em;}
-  select, input[type=text], input[type=date]{
+  select, input[type=text], input[type=date], input[type=number]{
     width:100%; padding:12px 12px; border-radius:11px; border:1px solid var(--border);
     background:var(--surface); color:var(--text); font-size:15px; font-family:inherit;
   }
@@ -145,6 +145,14 @@
     font-size:11.5px; color:var(--danger); background:none; border:none; padding:4px 0; cursor:pointer; text-align:left;
   }
 
+  .gphoto{margin:4px 0 14px;padding:12px;border:1.5px dashed var(--border);border-radius:14px;background:var(--surface-2);}
+  .gphoto.has{border-style:solid;border-color:var(--accent-tint);}
+  .gphoto.missing{border-color:var(--danger);background:var(--danger-tint);}
+  .gphoto-head{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-bottom:10px;font-size:13.5px;}
+  .gphoto-head .badge-photo{margin-top:0;}
+  .gphoto-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  .gphoto-item{position:relative;}
+  .gphoto-x{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:none;background:var(--danger);color:#fff;font-size:15px;line-height:1;cursor:pointer;}
   .day-pill{
     display:inline-flex; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px;
     background:var(--surface-2); color:var(--muted); margin-left:6px;
@@ -196,6 +204,120 @@
   .status-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;}
   .status-pill.ok{background:var(--success-tint);color:var(--success);}
   .status-pill.pending{background:var(--danger-tint);color:var(--danger);}
+
+  .recipe{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow); margin-bottom:12px; overflow:hidden;
+  }
+  .recipe-head{
+    display:flex; align-items:center; gap:12px; padding:15px 16px; cursor:pointer;
+  }
+  .recipe-num{
+    width:30px;height:30px;border-radius:9px;background:var(--accent-tint);color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex:none;
+  }
+  .recipe-head b{flex:1;font-size:15px;font-weight:700;}
+  .recipe-chevron{transition:transform .15s ease; color:var(--muted); flex:none;}
+  .recipe.open .recipe-chevron{transform:rotate(180deg);}
+  .recipe-body{padding:0 16px 16px 16px; display:none;}
+  .recipe.open .recipe-body{display:block;}
+  .steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .steps li{
+    display:flex; gap:10px; font-size:13.5px; line-height:1.55; align-items:flex-start;
+  }
+  .step-dot{
+    width:20px;height:20px;border-radius:50%;background:var(--surface-2);color:var(--muted);
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;
+  }
+  .manual-note{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    padding:12px 13px; font-size:12.5px; color:var(--muted); line-height:1.55; margin-bottom:16px;
+  }
+  .manual-note a{color:var(--accent-dark); font-weight:700;}
+
+  .method-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:16px; box-shadow:var(--shadow); margin-bottom:12px; cursor:pointer;
+    display:flex; align-items:center; gap:13px;
+  }
+  .method-card.disabled{opacity:.55; cursor:default;}
+  .method-icon{
+    width:42px;height:42px;border-radius:12px;background:var(--accent-tint);
+    display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;
+  }
+  .method-text{flex:1;min-width:0;}
+  .method-text b{font-size:15px;font-weight:700;display:block;margin-bottom:2px;}
+  .method-text span{font-size:12px;color:var(--muted);}
+  .method-tag{font-size:10.5px;color:var(--muted);background:var(--surface-2);
+    padding:3px 8px;border-radius:999px;border:1px solid var(--border);flex:none;}
+
+  .flow-strip{display:flex;overflow-x:auto;gap:8px;padding:2px 2px 12px;margin-bottom:4px;}
+  .flow-step{
+    flex:none; min-width:104px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:10px; font-size:11.5px; line-height:1.4; box-shadow:var(--shadow);
+  }
+  .flow-step b{display:block;font-size:11px;color:var(--accent-dark);margin-bottom:3px;}
+
+  .term-list{display:flex;flex-direction:column;gap:10px;}
+  .term-item b{font-size:13.5px;display:block;margin-bottom:2px;}
+  .term-item span{font-size:12.5px;color:var(--muted);line-height:1.5;}
+
+  .order-step{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow); margin-bottom:14px; overflow:hidden;
+  }
+  .order-step-head{display:flex;align-items:center;gap:12px;padding:15px 16px;}
+  .order-step-num{
+    width:34px;height:34px;border-radius:10px;background:var(--accent);color:#1C1408;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex:none;
+  }
+  .order-step-head b{font-size:15px;font-weight:700;}
+  .order-step-desc{font-size:13px;color:var(--muted);padding:0 16px 12px;line-height:1.55;}
+  .order-step-img{width:100%;display:block;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .order-step-cap{font-size:11.5px;color:var(--muted);padding:8px 16px 0;font-style:italic;}
+  .order-step-body{padding:14px 16px 16px;}
+  .callout{
+    display:flex; gap:9px; border-radius:12px; padding:11px 12px; font-size:12.5px;
+    line-height:1.55; margin-top:12px;
+  }
+  .callout b{display:block;font-size:11.5px;margin-bottom:2px;}
+  .callout.warn{background:var(--danger-tint);color:var(--danger);}
+  .callout.tip{background:var(--accent-tint);color:var(--accent-dark);}
+  .callout.check{background:var(--success-tint);color:var(--success);}
+
+  .plain-check-list{display:flex;flex-direction:column;gap:9px;}
+  .plain-check-item{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;}
+  .plain-check-item .box{
+    width:18px;height:18px;border-radius:6px;border:2px solid var(--border);flex:none;margin-top:2px;
+  }
+
+  .faq-item{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:14px; margin-bottom:10px;
+  }
+  .faq-item .q{font-size:13.5px;font-weight:700;margin-bottom:6px;display:flex;gap:8px;}
+  .faq-item .a{font-size:13px;color:var(--muted);line-height:1.55;padding-left:24px;}
+
+  .prod-row{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:12px 14px; margin-bottom:8px;
+  }
+  .prod-row .pname{font-size:14px;font-weight:700;margin-bottom:9px;}
+  .prod-row .prow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .prod-row label.mini{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+
+  .photo-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:14px; margin-bottom:10px;
+  }
+  .photo-card .pcname{font-size:14px;font-weight:700;margin-bottom:10px;}
+  .photo-card .pcbody{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .photo-card .pcbtn{
+    display:inline-flex;align-items:center;gap:6px;padding:10px 15px;font-size:13.5px;font-weight:700;
+    color:var(--accent-dark);border:1.5px solid var(--accent);border-radius:11px;background:var(--accent-tint);cursor:pointer;
+  }
+  .photo-card .pcthumb{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--border);}
+  .photo-card .pcstat{font-size:12px;color:var(--success);font-weight:700;}
 </style>
 </head>
 <body>
@@ -242,20 +364,20 @@
         <b>일일 · 주간<br>체크리스트 보고</b>
         <span class="tag">사용 가능</span>
       </button>
-      <button class="cat-card disabled" data-cat="bakery">
+      <button class="cat-card" data-cat="bakery">
         <span class="emoji">🍞</span>
         <b>베이커리<br>제조 매뉴얼</b>
-        <span class="tag">준비중</span>
+        <span class="tag">사용 가능</span>
       </button>
       <button class="cat-card disabled" data-cat="barista">
         <span class="emoji">☕</span>
         <b>바리스 브루<br>작동 · 이슈대응</b>
         <span class="tag">준비중</span>
       </button>
-      <button class="cat-card disabled" data-cat="order">
+      <button class="cat-card" data-cat="order">
         <span class="emoji">📦</span>
         <b>발주 시스템<br>매뉴얼</b>
-        <span class="tag">준비중</span>
+        <span class="tag">사용 가능</span>
       </button>
     </div>
   </section>
@@ -266,12 +388,102 @@
     <p class="lead">오늘 작성할 체크리스트를 선택하세요.</p>
     <div class="card" style="cursor:pointer;" data-type="daily">
       <h2>🗓️ 일일 체크리스트</h2>
-      <p class="muted-small" style="margin-top:6px;">바리스 청소 · 매장 청결 · 서비스 테이블 · 제조 시설 (총 11개 항목)</p>
+      <p class="muted-small" style="margin-top:6px;">바리스 청소 · 매장 청결 · 서비스 테이블 · 제조 시설 (총 20개 항목 · 카테고리별 사진 필수)</p>
     </div>
     <div class="card" style="cursor:pointer;" data-type="weekly">
       <h2>📆 주간 체크리스트</h2>
       <p class="muted-small" style="margin-top:6px;">요일별 심화 청소 항목 (전 항목 사진 필수)</p>
     </div>
+    <div class="card" style="cursor:pointer;" data-type="bakery-ops">
+      <h2>🥖 베이커리 생산·폐기 보고</h2>
+      <p class="muted-small" style="margin-top:6px;">당일 생산량 · 전일 폐기량 · 사진 보고 · 전일 매출 (별도 시스템 연결)</p>
+    </div>
+  </section>
+
+  <!-- BAKERY OPS menu -->
+  <section id="screen-bakery-ops" hidden>
+    <h1>베이커리 생산·폐기 보고</h1>
+    <p class="lead" id="bakeryOpsSub">생산·폐기, 사진, 매출을 이 앱에서 바로 입력하면 구글 시트에 저장됩니다.</p>
+    <div class="method-card" id="bpGoInput">
+      <div class="method-icon">🥖</div>
+      <div class="method-text"><b>생산·폐기 입력</b><span>당일 생산량 · 전일 폐기량</span></div>
+      <span class="method-tag">사용 가능</span>
+    </div>
+    <div class="method-card" id="bpGoPhoto">
+      <div class="method-icon">📷</div>
+      <div class="method-text"><b>사진 보고</b><span>항목별 사진 촬영·업로드</span></div>
+      <span class="method-tag">사용 가능</span>
+    </div>
+    <div class="method-card" id="bpGoSales">
+      <div class="method-icon">💰</div>
+      <div class="method-text"><b>전일 매출 입력</b><span>매출액 · 결제건수</span></div>
+      <span class="method-tag">사용 가능</span>
+    </div>
+    <div class="divider"></div>
+    <div class="method-card" id="bpGoDash">
+      <div class="method-icon">📊</div>
+      <div class="method-text"><b>관리자 대시보드</b><span>지점별 집계 · 사진 · 매출 현황</span></div>
+      <span class="method-tag">새 창 ↗</span>
+    </div>
+  </section>
+
+  <!-- BAKERY OPS: 생산·폐기 입력 -->
+  <section id="screen-bp-input" hidden>
+    <h1>🥖 생산·폐기 입력</h1>
+    <p class="lead" id="bpInputSub">상품별 당일 생산량과 전일(어제) 폐기량을 입력하세요.</p>
+    <div class="card">
+      <div class="field">
+        <label class="field-label">날짜</label>
+        <input type="date" id="bpInputDate">
+      </div>
+    </div>
+    <div id="bpProductRows"></div>
+    <button class="btn btn-primary" id="bpSubmitInput" style="margin-top:8px;">제출하기</button>
+    <p class="muted-small" style="text-align:center;margin-top:10px;">생산량은 오늘 만든 수량, 폐기량은 어제 버린 수량입니다. 같은 지점·날짜로 다시 제출하면 최신 값으로 덮어씁니다.</p>
+  </section>
+
+  <!-- BAKERY OPS: 사진 보고 -->
+  <section id="screen-bp-photo" hidden>
+    <h1>📷 사진 보고</h1>
+    <p class="lead" id="bpPhotoSub">항목별로 사진을 촬영하고 제출하세요.</p>
+    <div class="card">
+      <div class="field">
+        <label class="field-label">날짜</label>
+        <input type="date" id="bpPhotoDate">
+      </div>
+    </div>
+    <div id="bpPhotoItems"></div>
+    <button class="btn btn-primary" id="bpSubmitPhoto" style="margin-top:8px;">제출하기</button>
+    <p class="muted-small" style="text-align:center;margin-top:10px;">같은 지점·날짜·항목으로 다시 올리면 최신 사진으로 교체됩니다.</p>
+  </section>
+
+  <!-- BAKERY OPS: 전일 매출 입력 -->
+  <section id="screen-bp-sales" hidden>
+    <h1>💰 전일 매출 입력</h1>
+    <p class="lead">전일(어제) 매출액과 결제건수를 입력하세요.</p>
+    <div class="card">
+      <div class="field">
+        <label class="field-label">지점</label>
+        <select id="bpSalesBranch"></select>
+      </div>
+      <div class="field">
+        <label class="field-label">날짜 (전일)</label>
+        <input type="date" id="bpSalesDate">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">매출액 (원)</label>
+          <input type="number" id="bpSalesAmount" min="0" inputmode="numeric" placeholder="0">
+        </div>
+        <div class="field">
+          <label class="field-label">결제건수 (건)</label>
+          <input type="number" id="bpSalesCount" min="0" inputmode="numeric" placeholder="0">
+        </div>
+      </div>
+      <p class="muted-small" id="bpSalesAvg" style="margin-bottom:14px;">객단가 –</p>
+      <button class="btn btn-primary" id="bpSubmitSales">제출하기</button>
+    </div>
+    <p class="muted-small" style="text-align:center;">같은 지점·날짜로 다시 제출하면 최신 값으로 덮어씁니다.</p>
   </section>
 
   <!-- WORKER INFO -->
@@ -306,6 +518,38 @@
     <p class="lead" id="formSub"></p>
     <div id="formGroups"></div>
     <button class="btn btn-primary" id="btnSubmit" style="margin-top:8px;">제출하기</button>
+  </section>
+
+  <!-- BAKERY MANUAL -->
+  <section id="screen-manual-bakery" hidden>
+    <h1>베이커리 제조 매뉴얼</h1>
+    <p class="lead">사진으로 따라 하는 공정 표준 · Ver 1.0 · 2026</p>
+    <div class="manual-note">
+      공정 사진은 원본 슬라이드를 참고해주세요 →
+      <a href="https://docs.google.com/presentation/d/18_xwzvbnPh5yp3jEc5bQbIlcJPWfTEJo5WF-4j0SB-w/edit?usp=sharing" target="_blank" rel="noopener">원본 슬라이드 열기</a>
+    </div>
+    <div id="bakeryList"></div>
+  </section>
+
+  <!-- ORDER METHOD PICKER -->
+  <section id="screen-order-methods" hidden>
+    <h1>발주 시스템 매뉴얼</h1>
+    <p class="lead">발주 방법은 품목에 따라 세 가지로 나뉩니다. 확인할 방법을 선택하세요.</p>
+    <div class="method-card disabled" data-method="general">
+      <div class="method-icon">🧾</div>
+      <div class="method-text"><b>일반발주</b><span>바리스, 서비스테이블 등 — 아임웹 주문방법 (준비중)</span></div>
+      <span class="method-tag">준비중</span>
+    </div>
+    <div class="method-card disabled">
+      <div class="method-icon">✈️</div>
+      <div class="method-text"><b>에어서플라이</b><span>베이커리 재료, 사용 소모품 등</span></div>
+      <span class="method-tag">준비중</span>
+    </div>
+    <div class="method-card disabled">
+      <div class="method-icon">💬</div>
+      <div class="method-text"><b>카톡발주</b><span>빵 생지, 탄산수 등</span></div>
+      <span class="method-tag">준비중</span>
+    </div>
   </section>
 
   <!-- QUEUE / HISTORY -->
@@ -347,37 +591,110 @@
 
   /* ---------- Data: checklist definitions ---------- */
   var DAILY = [
-    { group:"바리스 청소", items:[
-      {id:"d1", label:"로봇 그리퍼 청소", photo:true},
-      {id:"d2", label:"배수로 청소", photo:true},
-      {id:"d3", label:"바리스 벽면 튄 음료 청소", photo:true},
-      {id:"d4", label:"음료 캘리브레이션", photo:false}
+    { group:"바리스 청소 (스팀기 사용)", items:[
+      {id:"d1", label:"로봇 그리퍼 및 로봇 레일 청소"},
+      {id:"d2", label:"배수로 및 벽면 튄 음료 청소"},
+      {id:"d3", label:"정수DP 요석 제거 청소"},
+      {id:"d4", label:"커피 퍽 통 비닐 교체"},
+      {id:"d5", label:"음료 캘리브레이션"},
+      {id:"d6", label:"캘리브레이션 직후 액상/시럽 DP 전체 린싱"},
+      {id:"d7", label:"재고 채운 뒤 바리스온 업데이트 (원두, 파우더, 시럽)"}
     ]},
     { group:"매장 청결", items:[
-      {id:"d5", label:"바닥 쓸기", photo:true},
-      {id:"d6", label:"바닥 대걸레질", photo:true},
-      {id:"d7", label:"키오스크 먼지 제거", photo:true}
+      {id:"d8", label:"바닥 쓸기, 물청소"},
+      {id:"d9", label:"키오스크 먼지 제거"},
+      {id:"d10", label:"POP 먼지 제거"},
+      {id:"d11", label:"쇼케이스 관리 (물 비우기 및 내부 먼지)"}
     ]},
     { group:"서비스 테이블", items:[
-      {id:"d8", label:"서비스 테이블 내부", photo:true},
-      {id:"d9", label:"서비스 테이블 외부", photo:true}
+      {id:"d12", label:"내부 · 음료 수거함 헹굼"},
+      {id:"d13", label:"내부 · 컵 회수통 헹굼"},
+      {id:"d14", label:"내부 · 쓰레기통 교체"},
+      {id:"d15", label:"외부 · 물품 채우기"},
+      {id:"d16", label:"외부 · 얼룩(음료) 제거"}
     ]},
     { group:"제조 시설", items:[
-      {id:"d10", label:"냉장·냉동고 정리상태", photo:true},
-      {id:"d11", label:"창고 시설 정리상태", photo:true}
+      {id:"d17", label:"냉장·냉동고 정리상태"},
+      {id:"d18", label:"창고 물품 랙 정리 상태"},
+      {id:"d19", label:"오븐 마감"},
+      {id:"d20", label:"컵DP"}
     ]}
   ];
 
-  var DOW = ["일","월","화","수","목","금","토"];
   var WEEKLY = [
-    {id:"w1", label:"창고 정리 및 발주", photo:true, day:"월"},
-    {id:"w2", label:"유리 청소 및 파우더 캘리브레이션", photo:true, day:"화"},
-    {id:"w3", label:"냉동고 서리제거", photo:true, day:"수"},
-    {id:"w4", label:"유리 청소 및 추가 발주", photo:true, day:"목"},
+    {id:"w1", label:"창고 정리 및 발주 (재고관리)", photo:true, day:"월"},
+    {id:"w2", label:"유리 청소 및 파우더(액상) 캘리브레이션", photo:true, day:"화"},
+    {id:"w3", label:"냉장/냉동고 서리 제거", photo:true, day:"수"},
+    {id:"w4", label:"매장 틈새 및 상부 먼지 제거", photo:true, day:"목"},
     {id:"w5", label:"오븐·도우 컨디셔너 청소", photo:true, day:"금"},
-    {id:"w6", label:"얼음·정수기 요석 제거", photo:true, day:"토", inferred:true},
-    {id:"w7", label:"바리스 내부 DP 청소", photo:true, day:"일"}
+    {id:"w6", label:"파우더 DP 믹싱볼 청소", photo:true, day:"토"},
+    {id:"w7", label:"액상/시럽 투출부분 청소", photo:true, day:"일"},
+    {id:"w8", label:"베이커리 매대 먼지 제거", photo:true, day:"일"}
   ];
+
+  var DOW = ["일","월","화","수","목","금","토"];
+
+  /* ---------- Data: bakery manual (출처: 베이커리_제조매뉴얼 슬라이드 v1.0) ---------- */
+  var BAKERY_MANUAL = [
+    { title:"오븐 & 도우컨디셔너 세팅 (데크 오븐)", steps:[
+      "오븐 세팅과 도우컨디셔너 세팅은 사진 위주 항목입니다. 아래 '원본 슬라이드'에서 사진을 확인해주세요."
+    ]},
+    { title:"플레인 소금빵 · 데크 오븐", steps:[
+      "소금빵 팬에 생지 10개를 팬닝하고, 세팅된 도우컨디셔너에 넣는다.",
+      "도우컨디셔너를 열어 소금빵 팬 홈의 80~90%까지 발효되면 생지의 머리부터 꼬리까지 소금을 토핑하고, 상불 210℃ / 하불 180℃로 예열된 오븐에 넣어 15분 전후로 빵의 색을 보고 빼준다.",
+      "오븐에서 뺀 빵은 식힘망으로 옮기거나 틀에서 빼서 열기를 빼고 식혀준다."
+    ], goal:"겉은 바삭하고 속은 촉촉하게 구워져야 한다." },
+    { title:"미니 컨백션 오븐 & 미니 도우컨디셔너 세팅", steps:[
+      "오븐 세팅과 도우컨디셔너 세팅은 사진 위주 항목입니다. 아래 '원본 슬라이드'에서 사진을 확인해주세요."
+    ]},
+    { title:"플레인 소금빵 · 미니 컨백션 오븐", steps:[
+      "발효가 끝난 생지의 위부터 아래까지 소금을 빠짐없이 일렬로 적당량 토핑한다. 오븐에 넣기 전 분무기로 생지 전체에 고르게 분무한 뒤 오븐에 넣는다. 넣자마자 가동 버튼을 누르고 스팀을 10초 작동한다.",
+      "170℃로 15분 구운 뒤, 소금빵의 색이 고르면 그대로 두고(고르지 않다면 팬을 돌려주고) 오븐 온도를 175℃로 올려 2~5분 더 구우면서 색을 보고 빼준다.",
+      "잘 구워진 소금빵의 색은 슬라이드의 사진과 같아야 한다."
+    ], goal:"겉은 바삭하고 속은 촉촉하게 구워져야 한다." },
+    { title:"베리에이션 소금빵 · 기본 원재료 준비", steps:[
+      "원재료 소분: 마요네즈, 갈릭버터, 명란마요를 짤주머니 형태로 소분한다.",
+      "김 슬라이스: 가위로 얇게 슬라이스하여 지퍼백에 보관한다."
+    ]},
+    { title:"① 명란 소금빵", steps:[
+      "마요네즈 짜기: 물결 모양대로 짠다. 두께가 두껍지 않고 얇아야 한다.",
+      "명란 마요 소스 짜기: 마요네즈와 반대 방향으로 짠다. 두께는 마요네즈와 동일하거나 조금 더 굵게.",
+      "슬라이스 김 올리기: 슬라이스된 김을 위쪽 중앙에 도포한다."
+    ], goal:"소스가 지저분하지 않을 것." },
+    { title:"② 갈릭 버터 소금빵", steps:[
+      "빵 칼집: 소금빵을 3등분, 깊이는 2/3 가량으로 넣는다.",
+      "갈릭버터 소스 짜기: 칼집 넣은 곳에 적정량(약 8g) 짠다.",
+      "마늘 버터 도포: 윗면과 옆면에 마늘 버터를 약 2줄 바른 후 붓으로 도포한다.",
+      "재굽기: 180℃에서 6~7분, 표면이 노릇해질 때까지.",
+      "파슬리 뿌리기: 파슬리를 뭉개가며 입자를 작게 뿌린다."
+    ], goal:"겉은 바삭, 속은 촉촉." },
+    { title:"③ 소금빵 러스크", steps:[
+      "설탕·계피 믹스 / 버터물 준비: 믹싱볼에 설탕 100g, 계피가루 5g을 잘 섞고, 다른 믹싱볼에 녹인 버터를 준비한다.",
+      "빵 슬라이스: 소금빵을 0.5mm 두께로 슬라이스한다.",
+      "버터물 적시기: 슬라이스한 소금빵 한 면에 버터물을 골고루 찍어 발라준다.",
+      "굽기: 오븐 160℃에서 16분 구운 뒤 완전히 식힌다.",
+      "포장: 14온스 아이스컵에 세워서 4개, 눕혀서 2개(대략) 넣고 뚜껑을 닫은 뒤 스티커를 슬라이드 사진과 같이 붙인다."
+    ], goal:"겉은 바삭하고 계피설탕이 고르게 묻어 있을 것." },
+    { title:"④ 휘낭시에 러스크", steps:[
+      "설탕·계피 믹스: 믹싱볼에 설탕 20g, 계피가루 2g을 잘 섞는다.",
+      "휘낭시에 슬라이스: 0.5cm 두께로 슬라이스한다.",
+      "설탕·계피: 슬라이스한 휘낭시에에 설탕, 계피가루를 골고루 묻힌다.",
+      "팬닝: 겹치지 않도록 팬닝한다.",
+      "굽기: 오븐 200℃에서 5분 구운 뒤 완전히 식힌다.",
+      "포장: 10온스 아이스컵에 슬라이드 사진과 같이 담는다."
+    ], goal:"겉은 바삭하고 계피설탕이 고르게 묻어 있을 것." },
+    { title:"에그마요 소금빵", steps:[
+      "에그마요 샐러드를 짤주머니 2개에 옮겨 담고 냉장 보관한다.",
+      "플레인 소금빵의 윗부분을 잘라준다. (소금빵이 힘이 없어 주저앉을 것 같으면 가위로 자른다.)",
+      "에그마요 샐러드 80g을 짜서 넣는다.",
+      "파슬리를 에그마요 샐러드 중간 부분에 적당량 토핑한다."
+    ], goal:"포장 후 에그마요 샐러드와 파슬리가 눈에 띄어야 한다." },
+    { title:"당근 라페 햄 소금빵", steps:[
+      "플레인 소금빵의 윗부분을 잘라준다. (소금빵이 힘이 없어 주저앉을 것 같으면 가위로 자른다.)",
+      "슬라이스 햄 1장을 접어 왼쪽에 넣고, 그 오른쪽으로 당근 라페 50g을 넣는다. 당근 라페는 락앤락 통에 넣어 냉장 보관한다."
+    ], goal:"당근 라페는 채즙을 충분히 털어낸 후 넣고, 당근 라페가 충분히 보여야 한다." }
+  ];
+
 
   /* ---------- State ---------- */
   var state = {
@@ -387,6 +704,7 @@
     worker: "",
     date: "",
     shift: "평일",
+    groupPhotos: {},
     formItems: []         // flattened working items with checked/photo
   };
 
@@ -408,7 +726,7 @@
 
   /* ---------- DOM refs ---------- */
   var el = {};
-  ["screen-home","screen-type","screen-info","screen-form","screen-queue"].forEach(function(id){
+  ["screen-home","screen-type","screen-info","screen-form","screen-queue","screen-manual-bakery","screen-order-methods","screen-bakery-ops","screen-bp-input","screen-bp-photo","screen-bp-sales"].forEach(function(id){
     el[id] = document.getElementById(id);
   });
   var storeSelect = document.getElementById("storeSelect");
@@ -458,22 +776,233 @@
   document.querySelectorAll(".cat-card").forEach(function(card){
     card.addEventListener("click", function(){
       if(card.classList.contains("disabled")) return;
-      if(!state.store){ toast("먼저 지점을 선택해주세요", "warn"); return; }
       var cat = card.getAttribute("data-cat");
-      if(cat === "checklist"){ goTo("screen-type"); }
+      if(cat === "checklist"){
+        if(!state.store){ toast("먼저 지점을 선택해주세요", "warn"); return; }
+        goTo("screen-type");
+      }
+      if(cat === "bakery"){ renderBakeryManual(); goTo("screen-manual-bakery"); }
+      if(cat === "order"){ goTo("screen-order-methods"); }
     });
   });
+
+  /* ---------- order method picker ---------- */
+  document.querySelectorAll(".method-card").forEach(function(card){
+    card.addEventListener("click", function(){
+      if(card.classList.contains("disabled")) return;
+    });
+  });
+
+  /* ---------- bakery manual ---------- */
+  function renderBakeryManual(){
+    var list = document.getElementById("bakeryList");
+    list.innerHTML = "";
+    BAKERY_MANUAL.forEach(function(recipe, idx){
+      var card = document.createElement("div");
+      card.className = "recipe";
+      var head = document.createElement("div");
+      head.className = "recipe-head";
+      head.innerHTML =
+        "<span class='recipe-num'>"+(idx+1)+"</span>"+
+        "<b>"+escapeHtml(recipe.title)+"</b>"+
+        "<svg class='recipe-chevron' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>";
+      head.addEventListener("click", function(){ card.classList.toggle("open"); });
+
+      var body = document.createElement("div");
+      body.className = "recipe-body";
+      var ul = document.createElement("ul");
+      ul.className = "steps";
+      recipe.steps.forEach(function(step, sIdx){
+        var li = document.createElement("li");
+        li.innerHTML = "<span class='step-dot'>"+(sIdx+1)+"</span><span>"+escapeHtml(step)+"</span>";
+        ul.appendChild(li);
+      });
+      body.appendChild(ul);
+      if(recipe.goal){
+        var g = document.createElement("div");
+        g.className = "callout";
+        g.innerHTML = "<b>완성 기준</b> · " + escapeHtml(recipe.goal);
+        body.appendChild(g);
+      }
+
+      card.appendChild(head);
+      card.appendChild(body);
+      list.appendChild(card);
+    });
+    if(BAKERY_MANUAL.length){
+      list.firstChild.classList.add("open");
+    }
+  }
 
   /* ---------- type picker ---------- */
   document.querySelectorAll("[data-type]").forEach(function(c){
     c.addEventListener("click", function(){
-      state.currentType = c.getAttribute("data-type");
+      var type = c.getAttribute("data-type");
+      if(type === "bakery-ops"){ renderBakeryOpsMenu(); goTo("screen-bakery-ops"); return; }
+      state.currentType = type;
       document.getElementById("infoTitle").textContent =
         (state.currentType === "daily" ? "일일 체크리스트" : "주간 체크리스트") + " 작성";
       document.getElementById("workDate").value = todayStr();
       goTo("screen-info");
     });
   });
+
+  /* ---------- bakery production/waste — native forms, direct to the same Google Sheet ---------- */
+  var BP_URL = "https://script.google.com/macros/s/AKfycbypNjs-Id7E1dPJOjTkUJhPtSFAI_-67aDDREvxkuljXZnzS762_JSbLGvl-_2f8bQGwQ/exec";
+  var BP_PRODUCTS = ["버터번","소금빵","명란마요 소금빵","갈릭버터 소금빵","햄치즈버터 소금빵","햄치즈머스타드 소금빵","바닐라 휘낭시에","솔티카라멜 휘낭시에","초코피칸 휘낭시에"];
+  var BP_PHOTO_ITEMS = ["오픈 후 모든 재고 채운 상태","1차 베이커리 생산 완료 후","퇴근 전 재고 확인","퇴근 전 Grab&Go 진열 상태"];
+  var BP_SALES_EXTRA = ["IFC몰점","두산분당타워점","에버랜드점","마포점"];
+  var BP_SALES_BRANCHES = STORES.concat(BP_SALES_EXTRA);
+
+  function bpSend(payload, onDone){
+    fetch(BP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function(){ onDone(true); }).catch(function(){ onDone(false); });
+  }
+
+  function yesterdayStr(){
+    var d = new Date(); d.setDate(d.getDate()-1);
+    var mm = String(d.getMonth()+1).padStart(2,"0");
+    var dd = String(d.getDate()).padStart(2,"0");
+    return d.getFullYear()+"-"+mm+"-"+dd;
+  }
+
+  document.getElementById("bpGoInput").addEventListener("click", function(){ renderBpInput(); goTo("screen-bp-input"); });
+  document.getElementById("bpGoPhoto").addEventListener("click", function(){ renderBpPhoto(); goTo("screen-bp-photo"); });
+  document.getElementById("bpGoSales").addEventListener("click", function(){ renderBpSales(); goTo("screen-bp-sales"); });
+  document.getElementById("bpGoDash").addEventListener("click", function(){ window.open(BP_URL + "?page=dashboard", "_blank"); });
+
+  /* -- 생산·폐기 입력 -- */
+  function renderBpInput(){
+    document.getElementById("bpInputSub").textContent = state.store
+      ? (state.store + " · 상품별 당일 생산량과 전일(어제) 폐기량을 입력하세요.")
+      : "먼저 상단에서 지점을 선택해주세요.";
+    document.getElementById("bpInputDate").value = todayStr();
+    var wrap = document.getElementById("bpProductRows");
+    wrap.innerHTML = "";
+    BP_PRODUCTS.forEach(function(p, i){
+      var row = document.createElement("div");
+      row.className = "prod-row";
+      row.innerHTML =
+        "<div class='pname'>"+escapeHtml(p)+"</div>"+
+        "<div class='prow2'>"+
+          "<div><label class='mini'>당일 생산량</label><input type='number' min='0' inputmode='numeric' placeholder='0' data-i='"+i+"' data-k='prod'></div>"+
+          "<div><label class='mini'>전일 폐기량</label><input type='number' min='0' inputmode='numeric' placeholder='0' data-i='"+i+"' data-k='waste'></div>"+
+        "</div>";
+      wrap.appendChild(row);
+    });
+  }
+  document.getElementById("bpSubmitInput").addEventListener("click", function(){
+    if(!state.store){ toast("먼저 지점을 선택해주세요", "warn"); return; }
+    var items = BP_PRODUCTS.map(function(p, i){
+      var prod = document.querySelector("#bpProductRows input[data-i='"+i+"'][data-k='prod']").value;
+      var waste = document.querySelector("#bpProductRows input[data-i='"+i+"'][data-k='waste']").value;
+      return { product:p, production:prod, waste:waste };
+    });
+    var hasAny = items.some(function(it){ return it.production !== "" || it.waste !== ""; });
+    if(!hasAny){ toast("생산량 또는 폐기량을 하나 이상 입력해주세요", "warn"); return; }
+    var btn = document.getElementById("bpSubmitInput");
+    btn.disabled = true; btn.textContent = "저장 중...";
+    bpSend({ type:"production", branch:state.store, date:document.getElementById("bpInputDate").value, items:items }, function(ok){
+      btn.disabled = false; btn.textContent = "제출하기";
+      toast(ok ? "생산·폐기 기록이 전송되었습니다" : "전송에 실패했습니다. 네트워크를 확인해주세요", ok ? "ok" : "err");
+      if(ok) goTo("screen-home");
+    });
+  });
+
+  /* -- 사진 보고 -- */
+  var bpPhotoStore = {};
+  function renderBpPhoto(){
+    document.getElementById("bpPhotoSub").textContent = state.store
+      ? (state.store + " · 항목별로 사진을 촬영하고 제출하세요.")
+      : "먼저 상단에서 지점을 선택해주세요.";
+    document.getElementById("bpPhotoDate").value = todayStr();
+    bpPhotoStore = {};
+    var wrap = document.getElementById("bpPhotoItems");
+    wrap.innerHTML = "";
+    BP_PHOTO_ITEMS.forEach(function(item, i){
+      var card = document.createElement("div");
+      card.className = "photo-card";
+      card.innerHTML =
+        "<div class='pcname'>"+escapeHtml(item)+"</div>"+
+        "<div class='pcbody'>"+
+          "<label class='pcbtn'>📷 촬영/선택<input type='file' accept='image/*' capture='environment' data-i='"+i+"' style='display:none;'></label>"+
+          "<img class='pcthumb' data-t='"+i+"' style='display:none;'>"+
+          "<span class='pcstat' data-s='"+i+"'></span>"+
+        "</div>";
+      wrap.appendChild(card);
+    });
+    wrap.querySelectorAll("input[type=file]").forEach(function(input){
+      input.addEventListener("change", function(ev){
+        var file = ev.target.files[0];
+        if(!file) return;
+        var i = input.getAttribute("data-i");
+        compressImage(file, function(dataUrl){
+          bpPhotoStore[BP_PHOTO_ITEMS[i]] = dataUrl;
+          var img = wrap.querySelector("img[data-t='"+i+"']");
+          img.src = dataUrl; img.style.display = "block";
+          wrap.querySelector("span[data-s='"+i+"']").textContent = "✓ 첨부됨";
+        });
+      });
+    });
+  }
+  document.getElementById("bpSubmitPhoto").addEventListener("click", function(){
+    if(!state.store){ toast("먼저 지점을 선택해주세요", "warn"); return; }
+    var items = Object.keys(bpPhotoStore).map(function(k){ return { item:k, dataUrl:bpPhotoStore[k] }; });
+    if(!items.length){ toast("사진을 하나 이상 첨부해주세요", "warn"); return; }
+    var btn = document.getElementById("bpSubmitPhoto");
+    btn.disabled = true; btn.textContent = "업로드 중...";
+    bpSend({ type:"photo", branch:state.store, date:document.getElementById("bpPhotoDate").value, items:items }, function(ok){
+      btn.disabled = false; btn.textContent = "제출하기";
+      toast(ok ? "사진이 업로드되었습니다" : "업로드에 실패했습니다. 네트워크를 확인해주세요", ok ? "ok" : "err");
+      if(ok) goTo("screen-home");
+    });
+  });
+
+  /* -- 전일 매출 입력 -- */
+  function renderBpSales(){
+    var sel = document.getElementById("bpSalesBranch");
+    sel.innerHTML = "";
+    BP_SALES_BRANCHES.forEach(function(b){
+      var o = document.createElement("option");
+      o.value = b; o.textContent = b;
+      sel.appendChild(o);
+    });
+    if(state.store && BP_SALES_BRANCHES.indexOf(state.store) !== -1){ sel.value = state.store; }
+    document.getElementById("bpSalesDate").value = yesterdayStr();
+    document.getElementById("bpSalesAmount").value = "";
+    document.getElementById("bpSalesCount").value = "";
+    document.getElementById("bpSalesAvg").textContent = "객단가 –";
+  }
+  function bpUpdateAvg(){
+    var s = Number(document.getElementById("bpSalesAmount").value) || 0;
+    var c = Number(document.getElementById("bpSalesCount").value) || 0;
+    document.getElementById("bpSalesAvg").textContent = "객단가 " + (c > 0 ? Math.round(s/c).toLocaleString("ko-KR") + "원" : "–");
+  }
+  document.getElementById("bpSalesAmount").addEventListener("input", bpUpdateAvg);
+  document.getElementById("bpSalesCount").addEventListener("input", bpUpdateAvg);
+  document.getElementById("bpSubmitSales").addEventListener("click", function(){
+    var s = document.getElementById("bpSalesAmount").value;
+    var c = document.getElementById("bpSalesCount").value;
+    if(s === "" && c === ""){ toast("매출액 또는 결제건수를 입력해주세요", "warn"); return; }
+    var branch = document.getElementById("bpSalesBranch").value;
+    var btn = document.getElementById("bpSubmitSales");
+    btn.disabled = true; btn.textContent = "저장 중...";
+    bpSend({ type:"sales", branch:branch, date:document.getElementById("bpSalesDate").value, sales:Number(s)||0, count:Number(c)||0 }, function(ok){
+      btn.disabled = false; btn.textContent = "제출하기";
+      toast(ok ? "매출이 저장되었습니다" : "저장에 실패했습니다. 네트워크를 확인해주세요", ok ? "ok" : "err");
+      if(ok) goTo("screen-home");
+    });
+  });
+
+  function renderBakeryOpsMenu(){
+    document.getElementById("bakeryOpsSub").textContent = state.store
+      ? (state.store + " 지점으로 기록됩니다. (매출입력은 화면에서 지점을 따로 선택할 수 있어요)")
+      : "생산·폐기, 사진, 매출을 이 앱에서 바로 입력하면 구글 시트에 저장됩니다.";
+  }
 
   function todayStr(){
     var d = new Date();
@@ -497,6 +1026,7 @@
     var container = document.getElementById("formGroups");
     container.innerHTML = "";
     state.formItems = [];
+    state.groupPhotos = {};
 
     document.getElementById("formTitle").textContent =
       (state.currentType === "daily" ? "일일 체크리스트" : "주간 체크리스트");
@@ -507,6 +1037,7 @@
       DAILY.forEach(function(group){
         renderGroup(container, group.group, group.items.length);
         group.items.forEach(function(it){ renderItem(container, it); });
+        renderGroupPhotos(container, group.group);
       });
     } else {
       var todayDow = DOW[new Date(state.date + "T00:00:00").getDay()];
@@ -524,6 +1055,60 @@
     h.className = "section-title";
     h.innerHTML = "<span>"+escapeHtml(title)+"</span><span class='count'>"+count+"</span>";
     container.appendChild(h);
+  }
+
+  function renderGroupPhotos(container, groupName){
+    state.groupPhotos[groupName] = [];
+    var box = document.createElement("div");
+    box.className = "gphoto";
+    box.id = "gphoto-" + groupName.replace(/[^0-9A-Za-z가-힣]/g,"");
+    var head = document.createElement("div");
+    head.className = "gphoto-head";
+    head.innerHTML = "<b>📷 "+escapeHtml(groupName)+" 사진</b><span class='badge-photo'>사진 필수 · 1장 이상</span>";
+    var grid = document.createElement("div");
+    grid.className = "gphoto-grid";
+    var add = document.createElement("label");
+    add.className = "photo-add";
+    add.innerHTML = "+<br>사진 추가";
+    var input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*"; input.multiple = true;
+    input.style.display = "none";
+    add.appendChild(input);
+
+    function redraw(){
+      grid.innerHTML = "";
+      state.groupPhotos[groupName].forEach(function(d, i){
+        var w = document.createElement("div");
+        w.className = "gphoto-item";
+        var im = document.createElement("img");
+        im.className = "photo-thumb"; im.src = d;
+        var x = document.createElement("button");
+        x.type = "button"; x.className = "gphoto-x"; x.textContent = "×";
+        x.setAttribute("aria-label","사진 삭제");
+        x.addEventListener("click", function(){
+          state.groupPhotos[groupName].splice(i,1); redraw();
+        });
+        w.appendChild(im); w.appendChild(x); grid.appendChild(w);
+      });
+      grid.appendChild(add);
+      box.classList.toggle("has", state.groupPhotos[groupName].length > 0);
+      box.classList.remove("missing");
+    }
+    input.addEventListener("change", function(ev){
+      var files = Array.prototype.slice.call(ev.target.files || []);
+      var pending = files.length;
+      if(!pending) return;
+      files.forEach(function(f){
+        compressImage(f, function(d){
+          state.groupPhotos[groupName].push(d);
+          if(--pending === 0){ redraw(); }
+        });
+      });
+      input.value = "";
+    });
+    box.appendChild(head); box.appendChild(grid);
+    container.appendChild(box);
+    redraw();
   }
 
   function renderItem(container, def, todayDow){
@@ -645,6 +1230,16 @@
 
   /* ---------- submit ---------- */
   document.getElementById("btnSubmit").addEventListener("click", function(){
+    if(state.currentType === "daily"){
+      var missing = Object.keys(state.groupPhotos).filter(function(g){ return !state.groupPhotos[g].length; });
+      if(missing.length){
+        document.querySelectorAll(".gphoto").forEach(function(b){ b.classList.toggle("missing", !b.classList.contains("has")); });
+        var first = document.querySelector(".gphoto.missing");
+        if(first) first.scrollIntoView({behavior:"smooth", block:"center"});
+        toast("사진이 없는 카테고리가 있습니다: " + missing.join(", "), "warn");
+        return;
+      }
+    }
     var unfinished = state.formItems.filter(function(i){ return !i.checked; });
     if(unfinished.length){
       var proceed = confirm("아직 완료하지 않은 항목이 "+unfinished.length+"개 있습니다. 그래도 제출할까요?");
@@ -662,6 +1257,9 @@
       items: state.formItems.map(function(i){
         return { label:i.label, checked:i.checked, hasPhoto: !!i.photoData, photoData: i.photoData || null };
       }),
+      groupPhotos: state.currentType === "daily"
+        ? Object.keys(state.groupPhotos).map(function(g){ return { group:g, photos: state.groupPhotos[g].slice() }; })
+        : [],
       status: "pending"
     };
     var q = safeGetQueue();
