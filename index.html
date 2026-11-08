@@ -391,11 +391,11 @@
     <p class="lead">오늘 작성할 체크리스트를 선택하세요.</p>
     <div class="card" style="cursor:pointer;" data-type="daily">
       <h2>🗓️ 일일 체크리스트</h2>
-      <p class="muted-small" style="margin-top:6px;">바리스 청소 · 매장 청결 · 서비스 테이블 · 제조 시설 (총 20개 항목 · 카테고리별 사진 필수)</p>
+      <p class="muted-small" style="margin-top:6px;">바리스 청소 · 매장 청결 · 서비스 테이블 · 제조 시설 (총 20개 항목 · 카테고리별 사진 첨부, 중간 저장 가능)</p>
     </div>
     <div class="card" style="cursor:pointer;" data-type="weekly">
       <h2>📆 주간 체크리스트</h2>
-      <p class="muted-small" style="margin-top:6px;">요일별 심화 청소 항목 (전 항목 사진 필수)</p>
+      <p class="muted-small" style="margin-top:6px;">요일별 심화 청소 항목 (사진 첨부는 선택, 중간 저장 가능)</p>
     </div>
     <div class="card" style="cursor:pointer;" data-type="bakery-ops">
       <h2>🥖 베이커리 생산·폐기 보고</h2>
@@ -519,8 +519,10 @@
   <section id="screen-form" hidden>
     <h1 id="formTitle">체크리스트</h1>
     <p class="lead" id="formSub"></p>
+    <p class="muted-small" id="saveStatus" style="margin:-8px 0 12px;"></p>
     <div id="formGroups"></div>
-    <button class="btn btn-primary" id="btnSubmit" style="margin-top:8px;">제출하기</button>
+    <button class="btn btn-primary" id="btnSubmit" style="margin-top:8px;">시트로 전송하기</button>
+    <p class="muted-small" style="margin-top:8px;text-align:center;">작업 중간에 여러 번 전송해도 같은 날짜 기록 하나로 갱신됩니다. 사진 첨부는 선택입니다.</p>
   </section>
 
   <!-- BAKERY MANUAL -->
@@ -708,6 +710,7 @@
     date: "",
     shift: "평일",
     groupPhotos: {},
+    draft: null,
     formItems: []         // flattened working items with checked/photo
   };
 
@@ -846,9 +849,19 @@
       document.getElementById("infoTitle").textContent =
         (state.currentType === "daily" ? "일일 체크리스트" : "주간 체크리스트") + " 작성";
       document.getElementById("workDate").value = todayStr();
+      try{ var w = localStorage.getItem("lx_worker"); if(w && !document.getElementById("workerName").value) document.getElementById("workerName").value = w; }catch(e){}
+      autoShift();
       goTo("screen-info");
     });
   });
+
+  function autoShift(){
+    var v = document.getElementById("workDate").value;
+    if(!v) return;
+    var dow = new Date(v + "T00:00:00").getDay();
+    document.getElementById("shiftType").value = (dow === 0 || dow === 6) ? "주말" : "평일";
+  }
+  document.getElementById("workDate").addEventListener("change", autoShift);
 
   /* ---------- bakery production/waste — native forms, direct to the same Google Sheet ---------- */
   var BP_URL = "https://script.google.com/macros/s/AKfycbypNjs-Id7E1dPJOjTkUJhPtSFAI_-67aDDREvxkuljXZnzS762_JSbLGvl-_2f8bQGwQ/exec";
@@ -1014,15 +1027,116 @@
     return d.getFullYear()+"-"+mm+"-"+dd;
   }
 
+  /* ---------- draft storage (IndexedDB, auto-save) ---------- */
+  var idb = null, idbReady = false, idbWaiters = [], memDrafts = {};
+  (function(){
+    function done(){ idbReady = true; idbWaiters.splice(0).forEach(function(f){ f(); }); }
+    try{
+      var r = indexedDB.open("lx_crewbook", 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore("drafts", {keyPath:"key"}); };
+      r.onsuccess = function(){ idb = r.result; pruneDrafts(); done(); };
+      r.onerror = function(){ done(); };
+      r.onblocked = function(){ done(); };
+    }catch(e){ done(); }
+  })();
+  function whenIdb(f){ if(idbReady) f(); else idbWaiters.push(f); }
+  function idbGet(key, cb){
+    if(!idb){ cb(memDrafts[key] || null); return; }
+    try{
+      var g = idb.transaction("drafts").objectStore("drafts").get(key);
+      g.onsuccess = function(){ cb(g.result || null); };
+      g.onerror = function(){ cb(memDrafts[key] || null); };
+    }catch(e){ cb(memDrafts[key] || null); }
+  }
+  function idbPut(rec, cb){
+    memDrafts[rec.key] = rec;
+    if(!idb){ if(cb) cb(); return; }
+    try{
+      var t = idb.transaction("drafts", "readwrite");
+      t.objectStore("drafts").put(rec);
+      t.oncomplete = function(){ if(cb) cb(); };
+      t.onerror = function(){ if(cb) cb(); };
+    }catch(e){ if(cb) cb(); }
+  }
+  function pruneDrafts(){
+    try{
+      var limit = Date.now() - 14*24*3600*1000;
+      var t = idb.transaction("drafts", "readwrite");
+      var c = t.objectStore("drafts").openCursor();
+      c.onsuccess = function(){
+        var cur = c.result;
+        if(!cur) return;
+        if((cur.value.updatedAt || 0) < limit) cur.delete();
+        cur.continue();
+      };
+    }catch(e){}
+  }
+
+  function newId(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function draftKey(){ return state.store + "|" + state.currentType + "|" + state.date; }
+  function hhmm(ts){
+    var d = new Date(ts);
+    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+
+  function collectDraft(){
+    var rec = state.draft || {};
+    rec.key = draftKey();
+    rec.store = state.store; rec.type = state.currentType; rec.date = state.date;
+    rec.shift = state.shift; rec.worker = state.worker;
+    rec.checked = {}; rec.itemPhotos = {};
+    state.formItems.forEach(function(i){
+      if(i.checked) rec.checked[i.id] = true;
+      if(i.photoData) rec.itemPhotos[i.id] = { id:i.photoId, data:i.photoData };
+    });
+    rec.groupPhotos = {};
+    Object.keys(state.groupPhotos).forEach(function(g){ rec.groupPhotos[g] = state.groupPhotos[g].slice(); });
+    rec.updatedAt = Date.now();
+    state.draft = rec;
+    return rec;
+  }
+  var saveTimer = null;
+  function scheduleSave(){
+    if(!state.currentType || !state.date) return;
+    setSaveStatus("saving");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 400);
+  }
+  function saveNow(){
+    clearTimeout(saveTimer); saveTimer = null;
+    if(!state.formItems.length) return;
+    idbPut(collectDraft(), function(){ setSaveStatus("saved"); });
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "hidden" && saveTimer) saveNow();
+  });
+  window.addEventListener("pagehide", function(){ if(saveTimer) saveNow(); });
+
+  function setSaveStatus(kind){
+    var el = document.getElementById("saveStatus");
+    if(!el) return;
+    var d = state.draft || {};
+    var sent = d.lastSentAt ? " · 마지막 전송 " + hhmm(d.lastSentAt) + ((d.updatedAt||0) > d.lastSentAt + 1500 ? " (이후 변경 있음)" : "") : " · 아직 전송 전";
+    if(kind === "saving") el.textContent = "저장 중…" + sent;
+    else el.textContent = "이 기기에 자동 저장됨 " + hhmm(d.updatedAt || Date.now()) + sent;
+  }
+
   /* ---------- worker info -> build form ---------- */
   document.getElementById("btnStartChecklist").addEventListener("click", function(){
     var name = document.getElementById("workerName").value.trim();
     if(!name){ toast("이름을 입력해주세요", "warn"); return; }
     state.worker = name;
+    try{ localStorage.setItem("lx_worker", name); }catch(e){}
     state.date = document.getElementById("workDate").value || todayStr();
     state.shift = document.getElementById("shiftType").value;
-    buildForm();
-    goTo("screen-form");
+    whenIdb(function(){
+      idbGet(draftKey(), function(d){
+        state.draft = d || null;
+        buildForm();
+        goTo("screen-form");
+        if(d){ toast("저장된 작업 내용을 불러왔습니다", "ok"); }
+      });
+    });
   });
 
   function buildForm(){
@@ -1039,18 +1153,20 @@
     if(state.currentType === "daily"){
       DAILY.forEach(function(group){
         renderGroup(container, group.group, group.items.length);
-        group.items.forEach(function(it){ renderItem(container, it); });
+        group.items.forEach(function(it){ renderItem(container, it, null, group.group); });
         renderGroupPhotos(container, group.group);
       });
     } else {
       var todayDow = DOW[new Date(state.date + "T00:00:00").getDay()];
-      renderGroup(container, "요일별 심화 청소 (전 항목 사진 필수)", WEEKLY.length);
+      renderGroup(container, "요일별 심화 청소", WEEKLY.length);
       WEEKLY.slice().sort(function(a,b){
         return (a.day===todayDow?0:1) - (b.day===todayDow?0:1);
       }).forEach(function(it){
-        renderItem(container, it, todayDow);
+        renderItem(container, it, todayDow, "");
       });
     }
+    if(state.draft){ state.draft.worker = state.worker; state.draft.shift = state.shift; }
+    setSaveStatus("saved");
   }
 
   function renderGroup(container, title, count){
@@ -1061,13 +1177,13 @@
   }
 
   function renderGroupPhotos(container, groupName){
-    state.groupPhotos[groupName] = [];
+    var saved = (state.draft && state.draft.groupPhotos && state.draft.groupPhotos[groupName]) || [];
+    state.groupPhotos[groupName] = saved.slice();
     var box = document.createElement("div");
     box.className = "gphoto";
-    box.id = "gphoto-" + groupName.replace(/[^0-9A-Za-z가-힣]/g,"");
     var head = document.createElement("div");
     head.className = "gphoto-head";
-    head.innerHTML = "<b>📷 "+escapeHtml(groupName)+" 사진</b><span class='badge-photo'>사진 필수 · 1장 이상</span>";
+    head.innerHTML = "<b>📷 "+escapeHtml(groupName)+" 사진</b><span class='badge-photo'>선택 · 여러 장 가능</span>";
     var grid = document.createElement("div");
     grid.className = "gphoto-grid";
     var add = document.createElement("label");
@@ -1080,22 +1196,21 @@
 
     function redraw(){
       grid.innerHTML = "";
-      state.groupPhotos[groupName].forEach(function(d, i){
+      state.groupPhotos[groupName].forEach(function(p, i){
         var w = document.createElement("div");
         w.className = "gphoto-item";
         var im = document.createElement("img");
-        im.className = "photo-thumb"; im.src = d;
+        im.className = "photo-thumb"; im.src = p.data;
         var x = document.createElement("button");
         x.type = "button"; x.className = "gphoto-x"; x.textContent = "×";
         x.setAttribute("aria-label","사진 삭제");
         x.addEventListener("click", function(){
-          state.groupPhotos[groupName].splice(i,1); redraw();
+          state.groupPhotos[groupName].splice(i,1); redraw(); scheduleSave();
         });
         w.appendChild(im); w.appendChild(x); grid.appendChild(w);
       });
       grid.appendChild(add);
       box.classList.toggle("has", state.groupPhotos[groupName].length > 0);
-      box.classList.remove("missing");
     }
     input.addEventListener("change", function(ev){
       var files = Array.prototype.slice.call(ev.target.files || []);
@@ -1103,8 +1218,8 @@
       if(!pending) return;
       files.forEach(function(f){
         compressImage(f, function(d){
-          state.groupPhotos[groupName].push(d);
-          if(--pending === 0){ redraw(); }
+          state.groupPhotos[groupName].push({ id:newId("p"), data:d });
+          if(--pending === 0){ redraw(); scheduleSave(); }
         });
       });
       input.value = "";
@@ -1114,38 +1229,40 @@
     redraw();
   }
 
-  function renderItem(container, def, todayDow){
-    var itemState = { id: def.id, label: def.label, photo: def.photo, checked:false, photoData:null };
+  function renderItem(container, def, todayDow, groupName){
+    var sp = state.draft && state.draft.itemPhotos && state.draft.itemPhotos[def.id];
+    var itemState = {
+      id: def.id, label: def.label, group: groupName || "", photo: !!def.photo,
+      checked: !!(state.draft && state.draft.checked && state.draft.checked[def.id]),
+      photoData: sp ? sp.data : null, photoId: sp ? sp.id : null
+    };
     state.formItems.push(itemState);
 
     var row = document.createElement("div");
-    row.className = "item";
+    row.className = "item" + (itemState.checked ? " done" : "");
     row.id = "item-"+def.id;
 
     var top = document.createElement("div");
     top.className = "item-top";
 
     var chk = document.createElement("div");
-    chk.className = "check";
+    chk.className = "check" + (itemState.checked ? " on" : "");
     chk.innerHTML = "<svg viewBox='0 0 24 24' fill='none' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 13l4 4L19 7'/></svg>";
     chk.addEventListener("click", function(){
-      if(itemState.photo && !itemState.photoData){
-        toast("사진을 먼저 첨부해주세요", "warn");
-        return;
-      }
       itemState.checked = !itemState.checked;
       chk.classList.toggle("on", itemState.checked);
       row.classList.toggle("done", itemState.checked);
+      scheduleSave();
     });
 
     var textWrap = document.createElement("div");
     textWrap.className = "item-text";
     var dayPillHtml = "";
     if(def.day){
-      dayPillHtml = "<span class='day-pill"+(def.day===todayDow?" today":"")+"'>"+def.day+"요일"+(def.day===todayDow?" · 오늘":"")+(def.inferred?" (임시배정)":"")+"</span>";
+      dayPillHtml = "<span class='day-pill"+(def.day===todayDow?" today":"")+"'>"+def.day+"요일"+(def.day===todayDow?" · 오늘":"")+"</span>";
     }
     textWrap.innerHTML = "<b>"+escapeHtml(def.label)+"</b>"+dayPillHtml+
-      (def.photo ? "<div><span class='badge-photo'>📷 사진 필수</span></div>" : "");
+      (def.photo ? "<div><span class='badge-photo'>📷 사진 첨부 (선택)</span></div>" : "");
 
     top.appendChild(chk);
     top.appendChild(textWrap);
@@ -1154,53 +1271,53 @@
     if(def.photo){
       var photoRow = document.createElement("div");
       photoRow.className = "photo-row";
-      var addBtn = document.createElement("label");
-      addBtn.className = "photo-add";
-      addBtn.textContent = "촬영";
-      var input = document.createElement("input");
-      input.type = "file"; input.accept = "image/*"; input.capture = "environment";
-      input.style.display = "none";
-      input.addEventListener("change", function(ev){
+      row.appendChild(photoRow);
+
+      function pickHandler(ev){
         var file = ev.target.files[0];
         if(!file) return;
         compressImage(file, function(dataUrl){
           itemState.photoData = dataUrl;
+          itemState.photoId = newId("p");
           renderPhotoState();
+          scheduleSave();
         });
-      });
-      addBtn.appendChild(input);
-      photoRow.appendChild(addBtn);
-
-      var hint = document.createElement("span");
-      hint.className = "photo-hint";
-      hint.textContent = "청소 완료 사진을 촬영해주세요";
-      photoRow.appendChild(hint);
-      row.appendChild(photoRow);
-
+      }
+      function makeBtn(text){
+        var lb = document.createElement("label");
+        lb.className = "photo-add";
+        lb.textContent = text;
+        var inp = document.createElement("input");
+        inp.type = "file"; inp.accept = "image/*"; inp.capture = "environment";
+        inp.style.display = "none";
+        inp.addEventListener("change", pickHandler);
+        lb.appendChild(inp);
+        return lb;
+      }
       function renderPhotoState(){
         photoRow.innerHTML = "";
+        if(!itemState.photoData){
+          photoRow.appendChild(makeBtn("촬영"));
+          var hint = document.createElement("span");
+          hint.className = "photo-hint";
+          hint.textContent = "청소 완료 사진을 촬영해주세요";
+          photoRow.appendChild(hint);
+          return;
+        }
         var img = document.createElement("img");
         img.className = "photo-thumb";
         img.src = itemState.photoData;
         photoRow.appendChild(img);
-
-        var retake = document.createElement("label");
-        retake.className = "photo-add";
-        retake.textContent = "다시\n촬영";
-        var input2 = document.createElement("input");
-        input2.type = "file"; input2.accept = "image/*"; input2.capture = "environment";
-        input2.style.display = "none";
-        input2.addEventListener("change", function(ev){
-          var file = ev.target.files[0];
-          if(!file) return;
-          compressImage(file, function(dataUrl){
-            itemState.photoData = dataUrl;
-            img.src = dataUrl;
-          });
+        photoRow.appendChild(makeBtn("다시\n촬영"));
+        var del = document.createElement("button");
+        del.type = "button"; del.className = "photo-remove"; del.textContent = "삭제";
+        del.addEventListener("click", function(){
+          itemState.photoData = null; itemState.photoId = null;
+          renderPhotoState(); scheduleSave();
         });
-        retake.appendChild(input2);
-        photoRow.appendChild(retake);
+        photoRow.appendChild(del);
       }
+      renderPhotoState();
     }
 
     container.appendChild(row);
@@ -1231,76 +1348,93 @@
     });
   }
 
-  /* ---------- submit ---------- */
-  document.getElementById("btnSubmit").addEventListener("click", function(){
-    if(state.currentType === "daily"){
-      var missing = Object.keys(state.groupPhotos).filter(function(g){ return !state.groupPhotos[g].length; });
-      if(missing.length){
-        document.querySelectorAll(".gphoto").forEach(function(b){ b.classList.toggle("missing", !b.classList.contains("has")); });
-        var first = document.querySelector(".gphoto.missing");
-        if(first) first.scrollIntoView({behavior:"smooth", block:"center"});
-        toast("사진이 없는 카테고리가 있습니다: " + missing.join(", "), "warn");
-        return;
-      }
+  /* ---------- build payload from a saved draft ---------- */
+  function buildPayload(d){
+    var defs = [];
+    if(d.type === "daily"){
+      DAILY.forEach(function(g){ g.items.forEach(function(it){ defs.push({def:it, group:g.group}); }); });
+    } else {
+      WEEKLY.forEach(function(it){ defs.push({def:it, group:""}); });
     }
-    var unfinished = state.formItems.filter(function(i){ return !i.checked; });
-    if(unfinished.length){
-      var proceed = confirm("아직 완료하지 않은 항목이 "+unfinished.length+"개 있습니다. 그래도 제출할까요?");
-      if(!proceed) return;
+    var done = 0;
+    var items = defs.map(function(x){
+      var ch = !!(d.checked && d.checked[x.def.id]);
+      if(ch) done++;
+      var ip = d.itemPhotos && d.itemPhotos[x.def.id];
+      return { label:x.def.label, group:x.group, checked:ch, hasPhoto:!!ip, photoData: ip ? ip.data : null, photoId: ip ? ip.id : null };
+    });
+    var gp = [];
+    var photoCount = items.filter(function(i){ return i.hasPhoto; }).length;
+    if(d.type === "daily"){
+      DAILY.forEach(function(g){
+        var arr = (d.groupPhotos && d.groupPhotos[g.group]) || [];
+        photoCount += arr.length;
+        gp.push({ group:g.group, photos:arr });
+      });
     }
-    var report = {
-      id: "r_" + Date.now() + "_" + Math.random().toString(36).slice(2,7),
-      store: state.store,
-      type: state.currentType,
-      typeLabel: state.currentType === "daily" ? "일일" : "주간",
-      date: state.date,
-      shift: state.shift,
-      worker: state.worker,
+    return {
+      id: newId("s_"),
+      key: d.key,
+      store: d.store,
+      type: d.type,
+      typeLabel: d.type === "daily" ? "일일" : "주간",
+      date: d.date,
+      shift: d.shift,
+      worker: d.worker,
       submittedAt: new Date().toISOString(),
-      items: state.formItems.map(function(i){
-        return { label:i.label, checked:i.checked, hasPhoto: !!i.photoData, photoData: i.photoData || null };
-      }),
-      groupPhotos: state.currentType === "daily"
-        ? Object.keys(state.groupPhotos).map(function(g){ return { group:g, photos: state.groupPhotos[g].slice() }; })
-        : [],
-      status: "pending"
+      done: done, total: items.length, complete: done === items.length,
+      photoCount: photoCount,
+      items: items, groupPhotos: gp
     };
-    var q = safeGetQueue();
-    q.unshift(report);
-    safeSetQueue(q);
-    trySend(report);
-    goTo("screen-home");
+  }
+
+  /* ---------- submit (중간 전송 가능, 같은 날짜 기록은 하나로 갱신됨) ---------- */
+  document.getElementById("btnSubmit").addEventListener("click", function(){
+    saveNow();
+    var d = state.draft;
+    if(!d){ toast("저장할 내용이 없습니다", "warn"); return; }
+    var p = buildPayload(d);
+    upsertQueue({ key:d.key, store:d.store, typeLabel:p.typeLabel, date:d.date, worker:d.worker,
+                  done:p.done, total:p.total, photoCount:p.photoCount, submittedAt:p.submittedAt, status:"pending" });
+    sendPayload(p, d.key);
     renderPendingBanner();
-    toast("체크리스트가 저장되었습니다. 전송을 시도합니다…", "ok");
+    toast(p.complete ? "체크리스트를 전송합니다 (전체 완료)" : "중간 저장본을 전송합니다 ("+p.done+"/"+p.total+")", "ok");
   });
 
+  /* ---------- queue: 같은 (지점·구분·날짜)는 한 줄로 관리 ---------- */
+  function upsertQueue(entry){
+    var q = safeGetQueue().filter(function(r){ return r.key !== entry.key; });
+    q.unshift(entry);
+    safeSetQueue(q.slice(0, 60));
+  }
+  function setQueueStatus(key, status, extra){
+    var q = safeGetQueue().map(function(r){
+      if(r.key === key){ r.status = status; if(extra){ for(var k in extra) r[k] = extra[k]; } }
+      return r;
+    });
+    safeSetQueue(q);
+    renderQueueScreen();
+  }
+
   /* ---------- webhook send ---------- */
-  function trySend(report){
-    if(!state.webhook){
-      markStatus(report.id, "pending");
-      renderPendingBanner();
-      return;
-    }
+  function sendPayload(payload, key){
+    if(!state.webhook){ setQueueStatus(key, "pending"); renderPendingBanner(); return; }
     fetch(state.webhook, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(report)
+      body: JSON.stringify(payload)
     }).then(function(){
       // no-cors: 응답 내용은 읽을 수 없으므로 전송 시도 성공 시 완료로 간주
-      markStatus(report.id, "sent");
+      var now = Date.now();
+      setQueueStatus(key, "sent", { sentAt: now });
+      if(state.draft && state.draft.key === key){ state.draft.lastSentAt = now; idbPut(state.draft); setSaveStatus("saved"); }
+      else { idbGet(key, function(dr){ if(dr){ dr.lastSentAt = now; idbPut(dr); } }); }
       renderPendingBanner();
     }).catch(function(){
-      markStatus(report.id, "pending");
+      setQueueStatus(key, "pending");
       renderPendingBanner();
     });
-  }
-
-  function markStatus(id, status){
-    var q = safeGetQueue();
-    q = q.map(function(r){ if(r.id === id) r.status = status; return r; });
-    safeSetQueue(q);
-    renderQueueScreen();
   }
 
   function retryAll(){
@@ -1308,18 +1442,23 @@
       toast("설정에서 웹훅 주소를 먼저 등록해주세요", "warn");
       return;
     }
-    var q = safeGetQueue();
-    var pend = q.filter(function(r){ return r.status !== "sent"; });
+    var pend = safeGetQueue().filter(function(r){ return r.status !== "sent" && r.key; });
     if(!pend.length){ toast("재전송할 항목이 없습니다", "ok"); return; }
-    pend.forEach(function(r){ trySend(r); });
+    pend.forEach(function(r){
+      whenIdb(function(){
+        idbGet(r.key, function(d){
+          if(!d){ return; }
+          sendPayload(buildPayload(d), r.key);
+        });
+      });
+    });
     toast(pend.length + "건 재전송을 시도합니다", "ok");
   }
 
   document.getElementById("btnRetryTop").addEventListener("click", retryAll);
 
   function renderPendingBanner(){
-    var q = safeGetQueue();
-    var pend = q.filter(function(r){ return r.status !== "sent"; });
+    var pend = safeGetQueue().filter(function(r){ return r.status !== "sent"; });
     var banner = document.getElementById("pendingBanner");
     document.getElementById("pendingCount").textContent = pend.length;
     banner.hidden = pend.length === 0;
@@ -1336,18 +1475,19 @@
     var list = document.getElementById("queueList");
     list.innerHTML = "";
     if(!q.length){
-      list.innerHTML = "<div class='empty'><div class='big'>🗂️</div>이 기기에서 제출한 기록이 없습니다.</div>";
+      list.innerHTML = "<div class='empty'><div class='big'>🗂️</div>이 기기에서 전송한 기록이 없습니다.</div>";
       return;
     }
     q.forEach(function(r){
-      var doneCount = r.items.filter(function(i){return i.checked;}).length;
+      var done = r.done != null ? r.done : (r.items || []).filter(function(i){return i.checked;}).length;
+      var total = r.total != null ? r.total : (r.items || []).length;
       var card = document.createElement("div");
       card.className = "card";
       card.innerHTML =
         "<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:8px;'>"+
           "<div>"+
-            "<h2>"+escapeHtml(r.store)+" · "+r.typeLabel+" 체크리스트</h2>"+
-            "<p class='muted-small' style='margin-top:4px;'>"+escapeHtml(r.date)+" · "+escapeHtml(r.worker)+" · 완료 "+doneCount+"/"+r.items.length+"</p>"+
+            "<h2>"+escapeHtml(r.store)+" · "+escapeHtml(r.typeLabel)+" 체크리스트</h2>"+
+            "<p class='muted-small' style='margin-top:4px;'>"+escapeHtml(r.date)+" · "+escapeHtml(r.worker)+" · 완료 "+done+"/"+total+(r.photoCount!=null?" · 사진 "+r.photoCount+"장":"")+"</p>"+
           "</div>"+
           "<span class='status-pill "+(r.status==="sent"?"ok":"pending")+"'>"+(r.status==="sent"?"전송완료":"전송대기")+"</span>"+
         "</div>";
